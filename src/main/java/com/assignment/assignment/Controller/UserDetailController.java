@@ -21,15 +21,15 @@ public class UserDetailController {
     @Autowired
     ModelMapper modelMapper;
 
-    @GetMapping("/{usedAccountId}")
+    @GetMapping("/{userAccountId}")
     public ResponseEntity<?> getUserDetailById(@PathVariable String userAccountId){
 
        try {
            User user = userDetailService.getUserById(userAccountId);
-           UserDto userDto = modelMapper.map(user, UserDto.class);
+           UserDto userDto=new UserDto(user.getUserName(),user.getUserAccountId());
            return new ResponseEntity<>(userDto, HttpStatus.FOUND);
        }catch(Exception e){
-           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+           return new ResponseEntity<>("Not exist in Db",HttpStatus.NOT_FOUND);
        }
 
     }
@@ -37,16 +37,22 @@ public class UserDetailController {
 
     @PostMapping
     public ResponseEntity<?> createNewUser(@RequestBody UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
-
         try {
-            userDetailService.getUserById(user.getUserAccountId());
-            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
-        } catch (RuntimeException e) {
-            userDetailService.createUser(user);
-            return new ResponseEntity<>(userDto, HttpStatus.CREATED);
-        }
+            User existingUser = userDetailService.getUserById(userDto.getUserAccountId());
+            if (existingUser != null) {
+                return new ResponseEntity<>("Already exists",HttpStatus.ALREADY_REPORTED);
+
+            }else {
+                User user = new User(userDto.getUserName(), userDto.getUserAccountId());
+                ResponseEntity<?> response = userDetailService.createUser(user);
+                return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+            }
+        }catch(Exception e ){
+                return new ResponseEntity<>("error",HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
     }
+
 
 
 

@@ -7,6 +7,7 @@ import com.assignment.assignment.entity.StockDetail;
 import com.assignment.assignment.entity.TradeDetails;
 import com.assignment.assignment.repository.StockDetailRepository;
 import com.assignment.assignment.repository.TradeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,11 @@ public class PortfolioServiceImpl implements PortfolioService {
     private StockDetailRepository stockDetailRepository;
 
     @Override
-    public PortofolioResponseDto getPortfolioByUserId(String userAccountId){
+    public PortofolioResponseDto getPortfolioByUserId(String userAccountId) throws ArithmeticException{
         List<TradeDetails> trades=tradeRepository.findByUserAccountId(userAccountId);
+
+        if(trades.isEmpty())return null;
+
         List<HoldingResponse>holdingList=new ArrayList<>();
         long totalBuyPrice=0;
         long totalCurrentValue=0;
@@ -56,12 +60,16 @@ public class PortfolioServiceImpl implements PortfolioService {
         }
 
         PortofolioResponseDto portofolioResponseDto=new PortofolioResponseDto();
-        portofolioResponseDto.setHoldings(holdingList);
-        portofolioResponseDto.setTotalPL(totalPL);
-        portofolioResponseDto.setTotalBuyPrice(totalBuyPrice);
-        portofolioResponseDto.setTotalPortfolioHolding(totalCurrentValue);
-        portofolioResponseDto.setPLPercentage((totalPL*100)/totalBuyPrice);
+        try{
+            portofolioResponseDto.setPLPercentage((totalPL * 100) / totalBuyPrice);
+            portofolioResponseDto.setHoldings(holdingList);
+            portofolioResponseDto.setTotalPL(totalPL);
+            portofolioResponseDto.setTotalBuyPrice(totalBuyPrice);
+            portofolioResponseDto.setTotalPortfolioHolding(totalCurrentValue);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-      return  portofolioResponseDto;
+   return  portofolioResponseDto;
     }
 }

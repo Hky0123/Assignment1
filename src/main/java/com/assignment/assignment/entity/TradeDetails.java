@@ -1,15 +1,16 @@
 package com.assignment.assignment.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 
 @Data
 @Entity
-
+@Table(name = "trade_details")
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 public class TradeDetails {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)

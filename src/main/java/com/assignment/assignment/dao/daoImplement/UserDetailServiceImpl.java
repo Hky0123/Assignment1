@@ -2,6 +2,7 @@ package com.assignment.assignment.dao.daoImplement;
 
 import com.assignment.assignment.dao.UserDetailService;
 import com.assignment.assignment.entity.User;
+import com.assignment.assignment.exception.UserNotFoundException;
 import com.assignment.assignment.repository.UserDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,9 +21,8 @@ public class UserDetailServiceImpl implements UserDetailService {
     }
 
     @Override
-    public User getUserById(String userAccountId) {
-        return userDetailRepository.findById(userAccountId)
-                .orElseThrow(() -> new RuntimeException("User does not exist"));
+    public User getUserById(String userAccountId) throws UserNotFoundException {
+        return userDetailRepository.findById(userAccountId).orElse(null);
     }
 
     @Override
